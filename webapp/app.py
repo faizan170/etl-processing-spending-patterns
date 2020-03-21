@@ -76,7 +76,7 @@ def calculateUser532(userId, monthGet=""):
     return finalOutPut
 
 def calculateMonthlyCategoryTotal(userId, monthGet=""):
-    transactions = list(data_tb.find({"userId" : ObjectId(userId)}))
+    transactions = list(data_tb.find({"userId" : ObjectId(userId), "excludedFromCalc" : False}))
     totalMonths = list(set([(int(a["madeOn"].split("/")[1]), int(a["madeOn"].split("/")[2])) for a in transactions]))
     totalMonths.sort()
     totalMonths.sort(key=lambda x: x[1])
@@ -95,7 +95,7 @@ def calculateMonthlyCategoryTotal(userId, monthGet=""):
             else:
                 data[tran["category"]] = [tran["amount"]]
         for key in data:
-            data[key] = abs(sum(data[key]))
+            data[key] = round(abs(sum(data[key])), 2)
         
         split = [str(month[0]), str(month[1])]
         if len(split[0]) == 1: split[0] = "0" + split[0]
@@ -123,8 +123,6 @@ def calculateDataCat():
     month = ""
     if "month" in data: month = data["month"]
     return jsonify(calculateMonthlyCategoryTotal(data["userId"], month))
-
-
 
 
 if __name__ == "__main__":
